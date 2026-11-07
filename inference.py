@@ -10,9 +10,9 @@ from tensorflow import keras
 load_dotenv()
 
 # Task 4.4: Read settings from environment variables
-MODEL_PATH = os.getenv("MODEL_PATH", "champion_mobilenetv2_best.keras")
+MODEL_PATH = os.getenv("MODEL_PATH", "champion_model.keras")
 THRESHOLD = float(os.getenv("THRESHOLD", "0.5"))
-MODEL_NAME = os.getenv("MODEL_NAME", "champion_mobilenetv2")
+MODEL_NAME = os.getenv("MODEL_NAME", "champion_model")
 
 print("="*80)
 print("INITIALIZING INFERENCE MODULE (TASK 4.1)")
@@ -28,14 +28,18 @@ except Exception as e:
     print(f"[!] Warning loading model: {e}")
     CHAMPION_MODEL = None
 
-def preprocess_image_bytes(image_bytes, target_size=(128, 128)):
+# The model knows its own input size, so serving always resizes exactly like training did.
+INPUT_SIZE = tuple(CHAMPION_MODEL.input_shape[1:3]) if CHAMPION_MODEL is not None else (128, 128)
+
+
+def preprocess_image_bytes(image_bytes, target_size=None):
     """
     Sub-task 4.1: Preprocesses an uploaded in-memory image exactly as in training:
     1. Reads byte buffer into PIL Image without writing to disk.
     2. Converts to 3-channel RGB (handles RGBA, Grayscale, CMYK).
-    3. Resizes to (128, 128) using bilinear interpolation.
+    3. Resizes to the model input size (e.g. 128x128) using bilinear interpolation.
     4. Converts to float32 NumPy tensor.
-    5. Adds batch dimension: shape (1, 128, 128, 3).
+    5. Adds batch dimension: shape (1, H, W, 3).
     """
     try:
         pil_img = Image.open(io.BytesIO(image_bytes))
@@ -45,6 +49,7 @@ def preprocess_image_bytes(image_bytes, target_size=(128, 128)):
     except Exception as e:
         raise ValueError(f"Image decode error: File is corrupted or unreadable ({e})")
 
+    target_size = tuple(target_size or INPUT_SIZE)
     pil_img = pil_img.resize(target_size, Image.Resampling.BILINEAR)
     img_array = np.array(pil_img, dtype=np.float32)
     img_batch = np.expand_dims(img_array, axis=0)

@@ -30,7 +30,7 @@ def client():
 # ---------- inference module (Task 4.1) ----------
 def test_preprocess_shape_and_dtype():
     batch = inference.preprocess_image_bytes(make_image_bytes())
-    assert batch.shape == (1, 128, 128, 3)
+    assert batch.shape == (1, *inference.INPUT_SIZE, 3)
     assert batch.dtype == np.float32
     assert 0.0 <= batch.min() and batch.max() <= 255.0  # raw pixels; scaling is inside the model
 
@@ -38,7 +38,7 @@ def test_preprocess_shape_and_dtype():
 @pytest.mark.parametrize("fmt,mode", [("PNG", "RGBA"), ("PNG", "L"), ("JPEG", "RGB")])
 def test_preprocess_handles_modes(fmt, mode):
     batch = inference.preprocess_image_bytes(make_image_bytes(fmt, mode))
-    assert batch.shape == (1, 128, 128, 3)
+    assert batch.shape == (1, *inference.INPUT_SIZE, 3)
 
 
 def test_preprocess_rejects_garbage():

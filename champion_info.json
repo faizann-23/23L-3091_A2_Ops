@@ -1,0 +1,17 @@
+{
+  "registered_model_name": "visionguard-detector",
+  "alias": "champion",
+  "version": "2",
+  "run_id": "072d66c48d654772bccb56f4072f123c",
+  "run_name": "run6_mobilenetv2_frozen",
+  "image_size": 128,
+  "threshold": 0.34,
+  "val_roc_auc": 0.8138651471984806,
+  "test": {
+    "accuracy": 0.7123287671232876,
+    "precision": 0.693069306930693,
+    "recall": 0.8641975308641975,
+    "f1": 0.7692307692307693,
+    "roc_auc": 0.7671415004748339
+  }
+}

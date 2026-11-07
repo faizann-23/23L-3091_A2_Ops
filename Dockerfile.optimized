@@ -27,7 +27,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Source + model, already owned by appuser (no duplicate layer)
-COPY --chown=appuser:appuser app.py inference.py database.py champion_mobilenetv2_best.keras ./
+COPY --chown=appuser:appuser app.py inference.py database.py champion_model.keras ./
 COPY --chown=appuser:appuser templates/ ./templates/
 
 USER appuser

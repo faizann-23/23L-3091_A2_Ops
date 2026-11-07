@@ -1,0 +1,13 @@
+-r requirements.txt
+# Needed only for the training / tracking scripts (audit, train, tune, MLflow, DVC), not for the web app
+mlflow>=3.0
+dagshub>=0.5
+dvc>=3.50
+dvc-http
+keras-tuner>=1.4
+matplotlib
+seaborn
+scikit-learn
+pandas
+requests
+tensorboard

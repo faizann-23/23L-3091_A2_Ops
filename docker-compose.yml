@@ -26,8 +26,8 @@ services:
       FLASK_DEBUG: "0"
       SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
       MAX_FILE_SIZE_MB: ${MAX_FILE_SIZE_MB:-5}
-      MODEL_PATH: ${MODEL_PATH:-champion_mobilenetv2_best.keras}
-      MODEL_NAME: ${MODEL_NAME:-champion_mobilenetv2}
+      MODEL_PATH: ${MODEL_PATH:-champion_model.keras}
+      MODEL_NAME: ${MODEL_NAME:-champion_model}
       THRESHOLD: ${THRESHOLD:-0.5}
       DB_BACKEND: postgres
       DB_HOST: db

@@ -17,3 +17,11 @@ COMPLETE_STEP_BY_STEP_GUIDE.txt
 tuner_logs/
 mlflow_local.db
 mlartifacts/
+
+/artifacts/
+mlflow.db
+*_best.keras
+
+/artifacts/
+mlflow.db
+*_best.keras

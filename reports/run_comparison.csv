@@ -1,0 +1,8 @@
+run,differs_from,best_epoch,threshold,val_roc_auc,val_f1,test_accuracy,test_precision,test_recall,test_f1,test_roc_auc,run_id
+run1_baseline_manual,"reference (baseline CNN, lr 1e-3, light augmentation, 128px)",1,0.49,0.4902,0.7137,0.5548,0.5548,1.0,0.7137,0.5571,b7771f134ce24ea3a41ecf18b751206f
+run2_baseline_autolog,run1: only the logging method (autologging instead of a callback),1,0.46,0.3979,0.7137,0.5548,0.5548,1.0,0.7137,0.4008,3419c9b1dd01412ba4715527d6f2adb7
+run3_baseline_lr_3e4,run1: learning rate 3e-4,3,0.49,0.5426,0.7137,0.5548,0.5548,1.0,0.7137,0.6473,7f129ced8c8344eeac1301ef86c71db2
+run4_baseline_heavy_aug,run1: heavy augmentation,1,0.48,0.4144,0.7137,0.5548,0.5548,1.0,0.7137,0.4498,09aa1d7bb6c64725a5aba69496395fa6
+run5_baseline_img96,run1: image size 96x96,1,0.48,0.4175,0.7137,0.5548,0.5548,1.0,0.7137,0.4486,143202d87ef54ca0b4267fff2dbcbb8a
+run6_mobilenetv2_frozen,"run1: backbone (MobileNetV2, whole base frozen)",3,0.34,0.8139,0.7955,0.7123,0.6931,0.8642,0.7692,0.7671,072d66c48d654772bccb56f4072f123c
+run7_mobilenetv2_finetune,run6: last block unfrozen and trained with lr 1e-5,6,0.23,0.7966,0.7872,0.6781,0.6441,0.9383,0.7638,0.7774,83829989b8fb4df8946b60567759c800

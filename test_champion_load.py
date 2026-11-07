@@ -8,6 +8,7 @@ Usage:
     python test_champion_load.py [path/to/image.jpg]
 """
 import glob
+import json
 import os
 import sys
 
@@ -20,20 +21,19 @@ from tensorflow import keras
 
 load_dotenv()
 
-MODEL_NAME = "VisionGuard_Classifier"
+MODEL_NAME = os.getenv("REGISTERED_MODEL_NAME", "visionguard-detector")
 ALIAS = "champion"
-IMG_SIZE = (128, 128)  # same size as in training
 
 repo_owner = os.getenv("DAGSHUB_REPO_OWNER", "faizann-23")
 repo_name = os.getenv("DAGSHUB_REPO_NAME", "23L-3091_A2_Ops")
 tracking_uri = os.getenv("MLFLOW_TRACKING_URI",
                          f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow")
-token = os.getenv("DAGSHUB_USER_TOKEN")
-if not token:
-    sys.exit("DAGSHUB_USER_TOKEN is not set. Put it in .env (see .env.example).")
-
-os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME", repo_owner)
-os.environ["MLFLOW_TRACKING_PASSWORD"] = token
+if "dagshub.com" in tracking_uri:
+    token = os.getenv("DAGSHUB_USER_TOKEN")
+    if not token:
+        sys.exit("DAGSHUB_USER_TOKEN is not set. Put it in .env (see .env.example).")
+    os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME", repo_owner)
+    os.environ["MLFLOW_TRACKING_PASSWORD"] = token
 mlflow.set_tracking_uri(tracking_uri)
 
 
@@ -51,9 +51,17 @@ def load_champion():
     return keras.models.load_model(keras_files[0]), mv.version
 
 
-def load_image(path):
+def champion_threshold():
+    """Decision threshold chosen on the validation set (written by log_visionguard_experiments.py)."""
+    if os.path.exists("champion_info.json"):
+        with open("champion_info.json") as f:
+            return float(json.load(f)["threshold"])
+    return float(os.getenv("THRESHOLD", "0.5"))
+
+
+def load_image(path, size):
     img = tf.io.decode_image(tf.io.read_file(path), channels=3, expand_animations=False)
-    img = tf.image.resize(img, IMG_SIZE)  # bilinear, as in training
+    img = tf.image.resize(img, size)  # bilinear, same size the model was trained with
     return tf.expand_dims(img, axis=0)
 
 
@@ -76,8 +84,10 @@ def main(image_path=None):
     print(f"\n[+] Input image   : {image_path}")
     print(f"[+] Ground truth  : {ground_truth}")
 
-    prob = float(model.predict(load_image(image_path), verbose=0)[0][0])
-    is_ai = prob >= 0.5
+    size = tuple(model.input_shape[1:3])
+    threshold = champion_threshold()
+    prob = float(model.predict(load_image(image_path, size), verbose=0)[0][0])
+    is_ai = prob >= threshold
     verdict = "AI-Generated Image" if is_ai else "Real Photography"
     confidence = (prob if is_ai else 1.0 - prob) * 100
 
@@ -87,7 +97,7 @@ def main(image_path=None):
     print(f"Model version      : {MODEL_NAME} v{version} (@{ALIAS})")
     print(f"Prediction Verdict : {verdict.upper()}")
     print(f"Confidence Score   : {confidence:.2f}%")
-    print(f"Raw Sigmoid Output : {prob:.4f}")
+    print(f"Raw Sigmoid Output : {prob:.4f} (threshold {threshold:.2f}, input {size[0]}x{size[1]})")
     if ground_truth != "Unknown":
         ok = (is_ai and ground_truth == "AI-Generated") or (not is_ai and ground_truth == "Real Photography")
         print(f"Match Ground Truth : {'YES (CORRECT)' if ok else 'NO'}")

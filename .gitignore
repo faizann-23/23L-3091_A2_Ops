@@ -12,3 +12,8 @@ tuner_visionguard_dir/
 visionguard.db
 COMMANDS_LOG.txt
 COMPLETE_STEP_BY_STEP_GUIDE.txt
+
+*.zip
+tuner_logs/
+mlflow_local.db
+mlartifacts/

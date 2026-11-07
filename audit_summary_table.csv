@@ -1,0 +1,3 @@
+class,image_count,width_min,width_median,width_max,height_min,height_median,height_max,size_kb_min,size_kb_median,size_kb_max,duplicate_images
+AI,539,225,1024.0,6000,135,800.0,4001,11.46,195.08,5494.32,1
+Real,434,183,945.0,8495,158,720.0,7091,11.05,141.445,9956.4,0

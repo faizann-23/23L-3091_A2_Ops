@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisionGuard — Prediction Audit History</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; }
+        header { background: #ffffff; border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.4rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+        nav { display: flex; gap: 1.5rem; align-items: center; }
+        nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 0.95rem; }
+        nav a:hover, nav a.active { color: var(--primary); font-weight: 600; }
+        main { flex: 1; max-width: 1000px; width: 100%; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.5rem; }
+        p.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        th { background: #f8fafc; font-weight: 600; color: #475569; }
+        tr:hover { background: #f1f5f9; }
+        .badge-verdict { padding: 0.25rem 0.6rem; border-radius: 9999px; font-weight: 600; font-size: 0.8rem; display: inline-block; }
+        .badge-ai { background: #fee2e2; color: #b91c1c; }
+        .badge-real { background: #d1fae5; color: #047857; }
+        .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+        footer { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border); background: #ffffff; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">🛡️ VisionGuard</a>
+        <nav>
+            <a href="/">Analyze</a>
+            <a href="/history" class="active">Prediction History</a>
+            <a href="/health" target="_blank">API Health</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="card">
+            <h1>Database Trail: Prediction Audit History</h1>
+            <p class="subtitle">Permanent queryable database record of all user inferences, verdicts, timestamps, and model confidence.</p>
+
+            {% if records and records|length > 0 %}
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Timestamp</th>
+                            <th>Filename</th>
+                            <th>Verdict</th>
+                            <th>Confidence</th>
+                            <th>Raw Score</th>
+                            <th>Model</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in records %}
+                        <tr>
+                            <td>#{{ r['id'] }}</td>
+                            <td style="color: var(--text-muted);">{{ r['timestamp'] }}</td>
+                            <td style="font-weight: 600;">{{ r['filename'] }}</td>
+                            <td>
+                                {% if 'AI' in r['verdict'] %}
+                                <span class="badge-verdict badge-ai">🤖 AI-Generated</span>
+                                {% else %}
+                                <span class="badge-verdict badge-real">📷 Real Photography</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-weight: 700;">{{ r['confidence'] }}%</td>
+                            <td style="font-family: monospace;">{{ r['raw_score'] }}</td>
+                            <td style="color: var(--text-muted); font-size: 0.8rem;">{{ r['model_name'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p style="font-size: 1.2rem; margin-bottom: 0.5rem;">No predictions recorded yet.</p>
+                <p>Upload an image from the <a href="/" style="color: var(--primary);">Analyze</a> page to generate database trail entries.</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer>
+        VisionGuard MLOps System &bull; Roll Number: 23L-3091 &bull; Database: {{ db_backend|default('sqlite') }}
+    </footer>
+</body>
+</html>

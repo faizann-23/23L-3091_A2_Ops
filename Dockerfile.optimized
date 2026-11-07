@@ -1,0 +1,40 @@
+# Task 6.4: optimised variant of the Dockerfile.  Build both and compare sizes:
+#   docker build -t visionguard-web:before .
+#   docker build -f Dockerfile.optimized -t visionguard-web:after .
+#   docker images visionguard-web
+#   docker history visionguard-web:before     # shows the biggest layers
+#
+# Changes vs. the original Dockerfile:
+#  1. COPY --chown instead of a later "chown -R /app": chown on already-copied files
+#     writes a second full copy of the 22 MB model into a new layer.
+#  2. No apt-get layer: curl (for HEALTHCHECK) is replaced by Python's urllib,
+#     so the image drops the apt package files and the extra layer.
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    FLASK_APP=app.py \
+    FLASK_DEBUG=0 \
+    PORT=5000
+
+WORKDIR /app
+
+# Non-root user created BEFORE the copies so --chown can use it (tiny layer)
+RUN useradd -m -u 1000 appuser && chown appuser:appuser /app
+
+# Dependencies first: this layer is cached until requirements.txt changes
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Source + model, already owned by appuser (no duplicate layer)
+COPY --chown=appuser:appuser app.py inference.py database.py champion_mobilenetv2_best.keras ./
+COPY --chown=appuser:appuser templates/ ./templates/
+
+USER appuser
+EXPOSE 5000
+
+# urlopen raises on HTTP 503, so an unhealthy app makes the check fail
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=4)"
+
+CMD ["python", "app.py"]

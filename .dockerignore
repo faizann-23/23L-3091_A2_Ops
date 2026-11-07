@@ -1,0 +1,18 @@
+# Task 6.2: Docker ignore file to keep secrets, heavy data, and environments out of the image
+.env
+.venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+dataset/
+dvc_remote_storage/
+dvc_toy_part/
+tuner_toy_dir/
+tuner_visionguard_dir/
+mlruns/
+mlflow.db
+*.png
+*.csv
+COMPLETE_STEP_BY_STEP_GUIDE.txt
+COMMANDS_LOG.txt

@@ -1,0 +1,72 @@
+# Task 6.3: Compose stack = web app + PostgreSQL database.
+#
+# - Services reach each other by SERVICE NAME ("db") on the internal network
+#   `visionguard_net`; Compose's built-in DNS resolves it.
+# - `db` publishes NO ports, so it is unreachable from the host or the internet.
+# - `db` stores data in the NAMED volume `visionguard_postgres_data` (survives `down`).
+# - `web` starts only after `db` reports healthy (pg_isready health check).
+# - Every secret comes from the untracked `.env` file (see `.env.example`).
+#   The `:?` syntax makes Compose stop with a clear message if a value is missing,
+#   so there is no password hard-coded in this file.
+# - Model file: BUILT INTO the image (COPY in the Dockerfile). The image is then
+#   self-contained and identical everywhere (laptop, CI, cloud VM), the model never
+#   needs a network call to DagsHub at request time, and a model version always
+#   matches the code version it was built with. A bind-mount would be better only
+#   if the model changed more often than the code.
+
+services:
+  web:
+    build: .
+    container_name: visionguard_web
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: "5000"
+      FLASK_DEBUG: "0"
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
+      MAX_FILE_SIZE_MB: ${MAX_FILE_SIZE_MB:-5}
+      MODEL_PATH: ${MODEL_PATH:-champion_mobilenetv2_best.keras}
+      MODEL_NAME: ${MODEL_NAME:-champion_mobilenetv2}
+      THRESHOLD: ${THRESHOLD:-0.5}
+      DB_BACKEND: postgres
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:?set DB_USER in .env}
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      DB_NAME: ${DB_NAME:?set DB_NAME in .env}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - visionguard_net
+
+  db:
+    image: postgres:15-alpine
+    container_name: visionguard_db
+    restart: unless-stopped
+    # NOTE (6.3): deliberately NO "ports:" section. Only containers on
+    # visionguard_net can reach PostgreSQL, at db:5432.
+    environment:
+      POSTGRES_USER: ${DB_USER:?set DB_USER in .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      POSTGRES_DB: ${DB_NAME:?set DB_NAME in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      # $$ stops Compose from substituting; the container shell expands it
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    networks:
+      - visionguard_net
+
+networks:
+  visionguard_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    name: visionguard_postgres_data

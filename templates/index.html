@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisionGuard — AI vs Real Image Classification</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --ai-red: #ef4444;
+            --real-green: #10b981;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; }
+        header { background: #ffffff; border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.4rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; text-decoration: none; }
+        nav { display: flex; gap: 1.5rem; align-items: center; }
+        nav a { color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 0.95rem; transition: color 0.2s; }
+        nav a:hover, nav a.active { color: var(--primary); font-weight: 600; }
+        .badge { background: #e0e7ff; color: #3730a3; padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        main { flex: 1; max-width: 900px; width: 100%; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 2rem; }
+        h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; }
+        p.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+        .upload-area { border: 2px dashed #cbd5e1; border-radius: 8px; padding: 2.5rem; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+        .upload-area:hover { border-color: var(--primary); background: #f0f7ff; }
+        .upload-area input { display: none; }
+        .upload-btn { background: var(--primary); color: #fff; border: none; padding: 0.75rem 1.75rem; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 1.25rem; width: 100%; transition: background 0.2s; }
+        .upload-btn:hover { background: var(--primary-hover); }
+        .error-alert { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.95rem; display: flex; align-items: center; gap: 0.75rem; }
+        .result-card { border-top: 4px solid var(--primary); margin-top: 1.5rem; padding-top: 1.5rem; }
+        .verdict-banner { display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem; }
+        .verdict-banner.ai { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .verdict-banner.real { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+        .preview-img { max-height: 280px; max-width: 100%; border-radius: 8px; object-fit: contain; margin: 1rem auto; display: block; border: 1px solid var(--border); }
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .meta-item { background: #f1f5f9; padding: 0.75rem; border-radius: 6px; }
+        .meta-item label { display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 0.25rem; }
+        .meta-item span { font-size: 1.1rem; font-weight: 700; }
+        .caveat-box { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; font-size: 0.85rem; padding: 0.75rem; border-radius: 6px; margin-top: 1.25rem; line-height: 1.4; }
+        footer { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border); background: #ffffff; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">
+            🛡️ VisionGuard
+            <span class="badge">Model: {{ model_name }}</span>
+        </a>
+        <nav>
+            <a href="/" class="active">Analyze</a>
+            <a href="/history">Prediction History</a>
+            <a href="/health" target="_blank">API Health</a>
+        </nav>
+    </header>
+
+    <main>
+        {% if error %}
+        <div class="error-alert">
+            <span>⚠️</span>
+            <div>{{ error }}</div>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h1>AI vs Real Image Detector</h1>
+            <p class="subtitle">Upload an image to evaluate whether it was captured photographically or generated by synthetic AI.</p>
+
+            <form method="POST" enctype="multipart/form-data" id="upload-form">
+                <label class="upload-area" for="file-input" id="drop-zone">
+                    <p id="file-label" style="font-size: 1.1rem; font-weight: 600; color: #334155; margin-bottom: 0.5rem;">
+                        📁 Click to choose an image or drag & drop here
+                    </p>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">
+                        Supported: PNG, JPG, JPEG, WEBP, BMP (Max 5 MB)
+                    </p>
+                    <input type="file" name="file" id="file-input" accept="image/*" required>
+                </label>
+
+                <button type="submit" class="upload-btn">Analyze Image</button>
+            </form>
+
+            {% if prediction %}
+            <div class="result-card">
+                {% if prediction.verdict == 'AI-Generated Image' %}
+                <div class="verdict-banner ai">
+                    <div style="font-size: 1.25rem; font-weight: 700;">🤖 {{ prediction.verdict }}</div>
+                    <div style="font-size: 1.1rem; font-weight: 700;">Confidence: {{ prediction.confidence }}%</div>
+                </div>
+                {% else %}
+                <div class="verdict-banner real">
+                    <div style="font-size: 1.25rem; font-weight: 700;">📷 {{ prediction.verdict }}</div>
+                    <div style="font-size: 1.1rem; font-weight: 700;">Confidence: {{ prediction.confidence }}%</div>
+                </div>
+                {% endif %}
+
+                {% if preview_img %}
+                <img src="{{ preview_img }}" alt="Uploaded preview" class="preview-img">
+                {% endif %}
+
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <label>Active Model</label>
+                        <span>{{ prediction.model_name }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <label>Decision Threshold</label>
+                        <span>{{ prediction.threshold }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <label>Raw Sigmoid Probability</label>
+                        <span>{{ prediction.raw_score }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <label>Storage Status</label>
+                        <span style="color: #059669; font-size: 0.95rem;">Logged in database</span>
+                    </div>
+                </div>
+
+                <div class="caveat-box">
+                    <strong>Honest Caveat:</strong> VisionGuard leverages deep feature analysis from MobileNetV2 fine-tuned on synthetic diffusion and photographic distributions. Extreme compression, heavy noise filters, or atypical artistic styles may impact classification confidence.
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer>
+        VisionGuard MLOps System &bull; Roll Number: 23L-3091 &bull; Project: 23L-3091_A2_Ops
+    </footer>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const fileLabel = document.getElementById('file-label');
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                fileLabel.textContent = `Selected: ${e.target.files[0].name} (${(e.target.files[0].size / 1024).toFixed(1)} KB)`;
+            }
+        });
+    </script>
+</body>
+</html>

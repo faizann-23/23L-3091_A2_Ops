@@ -1,0 +1,24 @@
+=======================================================
+EDA SUMMARY NUMBERS
+=======================================================
+[AI]  n = 539
+  median width x height     : 1024 x 800
+  median file size (KB)     : 195.1
+  median aspect ratio       : 1.50
+  square (0.95-1.05)        : 23.4%
+  landscape (> 1.05)        : 67.9%
+  portrait (< 0.95)         : 8.7%
+  shorter side < 224 px     : 1.7%
+  shorter side >= 1000 px   : 30.2%
+  PNG share                 : 20.4%
+
+[Real]  n = 435
+  median width x height     : 940 x 720
+  median file size (KB)     : 141.6
+  median aspect ratio       : 1.50
+  square (0.95-1.05)        : 9.9%
+  landscape (> 1.05)        : 69.4%
+  portrait (< 0.95)         : 20.7%
+  shorter side < 224 px     : 8.3%
+  shorter side >= 1000 px   : 31.5%
+  PNG share                 : 7.6%

@@ -1,0 +1,50 @@
+============================================================
+VISIONGUARD DATASET AUDIT
+============================================================
+Files found            : 975
+Image files audited    : 974
+Non-image files skipped: 1
+
+--- Images per class (total / readable / corrupt) ---
+       total  readable  corrupt
+class                          
+AI       539       539        0
+Real     435       435        0
+
+--- Width (px): min / median / max per class ---
+       min  median   max
+class                   
+AI     225  1024.0  6000
+Real   183   940.0  8495
+
+--- Height (px): min / median / max per class ---
+       min  median   max
+class                   
+AI     135   800.0  4001
+Real   158   720.0  7091
+
+--- File size (KB): min / median / max per class ---
+        min  median     max
+class                      
+AI     11.5   195.1  5494.3
+Real   11.0   141.6  9956.4
+
+--- File format per class ---
+format  JPEG  PNG
+class            
+AI       429  110
+Real     402   33
+
+--- Colour mode per class ---
+mode   L   P  RGB  RGBA
+class                  
+AI     1  14  489    35
+Real   6   9  406    14
+
+--- Corrupt / unreadable files: 0 ---
+
+--- Exact duplicates (same SHA-256) ---
+Duplicate groups                 : 1
+Redundant files (could be removed): 1
+Groups appearing in BOTH classes : 0
+  f3268a4fc047...  data/raw/AiArtData/AiArtData/image33.jpg | data/raw/AiArtData/AiArtData/image34.jpg

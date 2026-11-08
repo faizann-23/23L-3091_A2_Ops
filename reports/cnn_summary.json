@@ -1,0 +1,11 @@
+{
+  "name": "cnn",
+  "epochs_run": 23,
+  "best_epoch": 15,
+  "train_loss": 0.6309479475021362,
+  "train_accuracy": 0.7048457860946655,
+  "val_loss": 0.6375275254249573,
+  "val_accuracy": 0.6506849527359009,
+  "val_auc": 0.686039924621582,
+  "learning_rate_at_best": 0.0005000000237487257
+}

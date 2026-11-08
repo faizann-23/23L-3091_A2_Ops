@@ -1,0 +1,25 @@
+{
+  "stage1": {
+    "name": "mobilenet_stage1",
+    "epochs_run": 19,
+    "best_epoch": 14,
+    "train_loss": 0.4048369526863098,
+    "train_accuracy": 0.8237885236740112,
+    "val_loss": 0.6110862493515015,
+    "val_accuracy": 0.6712328791618347,
+    "val_auc": 0.742165207862854,
+    "learning_rate_at_best": 0.0005000000237487257
+  },
+  "stage2": {
+    "name": "mobilenet_stage2",
+    "epochs_run": 11,
+    "best_epoch": 6,
+    "train_loss": 0.3192969262599945,
+    "train_accuracy": 0.850220263004303,
+    "val_loss": 0.6169925928115845,
+    "val_accuracy": 0.698630154132843,
+    "val_auc": 0.7600189447402954,
+    "learning_rate_at_best": 4.999999873689376e-06
+  },
+  "selected": "mobilenet_stage1"
+}

@@ -1,0 +1,11 @@
+{
+  "name": "mobilenet_stage2",
+  "epochs_run": 11,
+  "best_epoch": 6,
+  "train_loss": 0.3192969262599945,
+  "train_accuracy": 0.850220263004303,
+  "val_loss": 0.6169925928115845,
+  "val_accuracy": 0.698630154132843,
+  "val_auc": 0.7600189447402954,
+  "learning_rate_at_best": 4.999999873689376e-06
+}

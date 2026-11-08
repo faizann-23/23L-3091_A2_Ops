@@ -1,0 +1,13 @@
+Audited images                 : 974
+Used (no corrupt, no duplicates): 973
+Removed                        : 1
+
+class   AI  Real  All
+split                
+test    80    66  146
+train  377   304  681
+val     81    65  146
+All    538   435  973
+
+label 1 = AI-generated, label 0 = Real | seed = 42 | image size = 224
+val element_spec: (TensorSpec(shape=(None, 224, 224, 3), dtype=tf.float32, name=None), TensorSpec(shape=(None,), dtype=tf.float32, name=None))

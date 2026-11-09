@@ -1,0 +1,12 @@
+======================================================================
+TEST SET EVALUATION  (n = 146, share of AI images = 0.548)
+Majority-class baseline accuracy: 0.548
+======================================================================
+                 model                 setting  threshold  accuracy  precision  recall  specificity    f1  roc_auc  tn  fp  fn  tp accuracy_95ci    auc_95ci
+          Baseline CNN        chosen threshold       0.53     0.658      0.683   0.700        0.606 0.691    0.704  40  26  24  56   0.582-0.733 0.615-0.788
+          Baseline CNN default 0.5 (reference)       0.50     0.685      0.685   0.788        0.561 0.733    0.704  37  29  17  63                          
+MobileNetV2 (transfer)        chosen threshold       0.46     0.733      0.736   0.800        0.652 0.766    0.833  43  23  16  64   0.664-0.801 0.769-0.895
+MobileNetV2 (transfer) default 0.5 (reference)       0.50     0.733      0.741   0.788        0.667 0.764    0.833  44  22  17  63                          
+
+Threshold chosen on validation for Baseline CNN: 0.53
+Threshold chosen on validation for MobileNetV2 (transfer): 0.46

@@ -54,7 +54,9 @@ def build_augmenter(seed=SEED):
     )
 
 
-def build_dataset(split, training, batch_size=BATCH_SIZE, img_size=IMG_SIZE, seed=SEED):
+def build_dataset(split, training, batch_size=BATCH_SIZE, img_size=IMG_SIZE, seed=SEED, augment=None):
+    """augment=None -> augment only while training; augment=False switches augmentation off."""
+    do_aug = training if augment is None else (training and augment)
     df = pd.read_csv(SPLIT_DIR / f"{split}.csv")
     paths = df["path"].values
     labels = df["label"].values.astype("float32")
@@ -66,14 +68,13 @@ def build_dataset(split, training, batch_size=BATCH_SIZE, img_size=IMG_SIZE, see
     if training:
         ds = ds.shuffle(len(df), seed=seed, reshuffle_each_iteration=True)
     ds = ds.batch(batch_size)
-    if training:
+    if do_aug:
         aug = build_augmenter(seed)
         ds = ds.map(lambda x, y: (aug(tf.cast(x, tf.float32), training=True), y),
                     num_parallel_calls=tf.data.AUTOTUNE)
     else:
         ds = ds.map(lambda x, y: (tf.cast(x, tf.float32), y), num_parallel_calls=tf.data.AUTOTUNE)
     return ds.prefetch(tf.data.AUTOTUNE)
-
 
 if __name__ == "__main__":
     audit = pd.read_csv(AUDIT_CSV)

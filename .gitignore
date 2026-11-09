@@ -5,3 +5,5 @@ __pycache__/
 mlruns/
 *.zip
 tuner_logs/
+mlflow_local.db
+mlartifacts/

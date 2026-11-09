@@ -1,0 +1,10 @@
+{
+  "best": {
+    "run": "E_mnv2_unfrozen40",
+    "run_id": "7f81255df0094df8bef09a638cf44b22"
+  },
+  "baseline": {
+    "run": "A_mnv2_base_manual",
+    "run_id": "47e5f848b4754e7dbb21d21660e8d624"
+  }
+}
